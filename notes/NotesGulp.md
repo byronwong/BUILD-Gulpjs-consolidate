@@ -13,7 +13,8 @@ Gulp
 
 	then create gulpfile.js --> see gulp file for additional notes
 
-	npm instal --save-dev gulp-util	// log plugin
+	npm install --save-dev gulp-util	// log plugin
+	npm install --save-dev gulp-coffee
 
 	to run tasks use:
 
