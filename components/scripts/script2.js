@@ -1,0 +1,3 @@
+(function(){
+	var two = "two";
+}());
