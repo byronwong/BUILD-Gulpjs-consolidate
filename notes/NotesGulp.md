@@ -17,6 +17,12 @@ Setup
 	npm init --> setup package.json
 
 
+
+	Create .gitignore
+	
+
+
+
 Commands
 ========
 
