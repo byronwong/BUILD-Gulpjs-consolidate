@@ -5,6 +5,8 @@ Setup
 Gulp
 ----
 
+	Requires Node:
+
 	npm install -g gulp
 
 	in project folder:
@@ -28,6 +30,22 @@ Browserify
 
 	npm install -g browserify
 	
+	npm install --save-dev gulp-browserify
+		
+	npm install --save jquery
+
+	npm install --save mustache
+
+	// you can add dependancies to a js file by using:
+
+	var myVar = require('moduleName');	
+	var	$ = require('jquery'); 
+
+	By adding this browserify with automatically include this dependancy, you can even do this in you nomarl js files, such as including jquery.
+
+
+
+	
 
 
 Sass
@@ -40,6 +58,19 @@ Sass
 	gem install sass
 
 	gem install compass
+
+	npm install --save-dev gulp-compass
+
+	(creating a config.rb file ?)
+
+
+Compass
+-------
+	gem list	// returns all gems
+
+	gem install compass
+
+
 
 	
 NPM
@@ -56,7 +87,26 @@ Git
 	
 	Create new repository on github
 
+Bower
+-----
 
+	npm install -g bower
+
+Then in root dir
+
+	bower init
+
+	bower install // gets all required packages
+
+	bower install jquery --save
+
+	bower install jquery angular backbone --save  // installs all 3
+
+	bower list // returns everything you have installed via bower
+
+	bower list --paths	// returns package paths
+
+	bower uninstall PACKAGE --save
 
 
 Commands
