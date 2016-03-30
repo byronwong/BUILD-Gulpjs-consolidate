@@ -2,25 +2,86 @@
 // GULPFILE
 // ========
 
-
 // PACKAGES
 // --------
 var gulp = require('gulp'),	// asks node to get the gulp library and assign to var
 	uglify = require('gulp-uglify'),
+	//minify = require('gulp-minify'),
 	browserify = require('gulp-browserify'),
 	sass = require('gulp-ruby-sass'),
 	concat = require('gulp-concat'),
-	plumber = require('gulp-plumber'),
-	connect = require('gulp-connect');
-	// Deprecated : gulp.src('components/sass/main.scss') = require('gulp-pumber');
+	//plumber = require('gulp-plumber'),
+	connect = require('gulp-connect'),
+	gulpif = require('gulp-if');
 
 	//gutil = require('gulp-util'), // loging system
 	//coffee = require('gulp-coffee');
 	//compass = require('gulp-compass'),
 
 
+// ENVIRONMENTS & OTHER VARIABLES
+// ------------------------------
+// Switching from dev to production using environment variables via node
+// https://nodejs.org/api/process.html#process_process_env
+// Check to see if environment var is setup if not create 'development'
+var 
+	// CSS format style when compiled
+	cssFormat,
+	
+	// Base output paths
+	devPath = './builds/development/',
+	prodPath = './builds/production/',
+
+	// Deploy Environment Setting Variable
+	env = process.env.NODE_ENV || 'development',
+
+	// Modifies output path depending on environment variable
+	// To change to production:
+	// NODE_ENV=production gulp
+	// NOTE: windows try set NODE_ENV=production gulp
+	// If not change the default
+	outputPath = (function(){
+
+		if (env === 'development'){
+			cssFormat = 'expanded';
+			return devPath;
+		} else if (env === 'production'){
+			cssFormat = 'compressed';
+			return prodPath;
+		}
+
+	}());
+
+
+// RESULTING PATHS
+// ---------------
+// COMPONENTS (INPUT)
+var 
+	inputPathHTML, // Add html folder
+	inputPathIndex = './builds/development/*.html', // can change to inputPathHTML for html folder
+	inputPathSASS = './components/sass/*.scss',
+	inputPathJS = './components/scripts/*.js',
+
+	inputPathJSON = './builds/development/js/*.json', // can remove
+	
+	compPathMainSASS = './components/sass/main.scss',
+	
+// OUTPUT --> ./builds/<outputPath>/
+	outputRoot = outputPath,
+	outputPathHTML =  outputPath, // add HTML folder path
+	outputPathIndex = outputPath, 
+	outputPathCSS = outputPath + 'css/',
+
+	outputPathJS = outputPath + '/js',
+	outputPathJSON =  outputPath + 'js/'; // can remove
+
+
+
+// REUSEABLE Functions
+// -------------------
 
 // Error Handling - instead of using plumber
+// ALT: .on('error', console.log.bind(console)) // prevents gulp to exit watch if there is an error
 var errorlog = function(){
 	console.error.bind(console);
 	this.emit('end'); // emitts end event that stops gulp from exiting/crashing
@@ -28,122 +89,122 @@ var errorlog = function(){
 
 
 
-// TEMPLATE
-/*
-	gulp.task('[string: task name]', '[array: strings dependancy tasks]', callback function(){});
-*/
-
-
-
-// JS
-// UGLIFY
-// ------
-gulp.task('uglify', function(){
-	gulp.src('components/scripts/*.js')
-	.pipe(plumber())
-	.pipe(uglify())
-	.pipe(gulp.dest('builds/development/js/'));
-});
-
+// GULP TEMPLATES NOTES
+// --------------------
+	// gulp.task('[string: task name]', '[array: strings dependancy tasks]', callback function(){});
+	// don't even need callback function.
+	// can add required tasks for the callback task to run:
+	// gulp.task('js', ['uglify', 'concat']); 
 
 
 
 // JS
 // CONCAT
 // ------
-gulp.task('concat', ['uglify'], function(){
+gulp.task('concatJS', function(){
 	
-	// could use *.js
-	var jsSource = [
-		'components/scripts/script1.js',
-		'components/scripts/script2.js'
-		//'components/scripts/tagline.js'
-	]; 
-
-	gulp.src('builds/development/js/*.js')
-		.pipe(plumber())
+	return gulp.src(inputPathJS)
+		//.pipe(plumber())
 		.pipe(concat('script.js'))
-		.pipe(browserify())
-		.pipe(gulp.dest('builds/development/js/'))
+		.on('error', errorlog)
+		.pipe(gulpif( env === 'production', uglify()))
+		.pipe(gulp.dest(outputPathJS))
 		.pipe(connect.reload());
-
 });
-
-
-// OR
-// don't even need callback function.
-// can add required tasks for the callback task to run
-gulp.task('js', ['uglify', 'concat']); 
-
-
-
-
 
 
 // CSS
 // SASS Compile
 // ------------
-gulp.task('styles', function(){
+gulp.task('compileSASS', function(){
 
 	// Deprecated : gulp.src('components/sass/main.scss')
-	return sass('components/sass/main.scss', {
-		style: 'compressed',
+	return sass(inputPathSASS, {
+		style: cssFormat,
 	})
-		//.on('error', console.log.bind(console)) // prevents gulp to exit watch if there is an error
-		// OR
 		.on('error', errorlog)
-		.pipe(gulp.dest('builds/development/css/'))
+		.pipe(gulp.dest(outputPathCSS))
 		.pipe(connect.reload());
 });
 
 
-
 // HTML
-gulp.task('html', function () {
-  gulp.src('./builds/development/*.html')
+gulp.task('updateHTML', function () {
+
+  return gulp.src(inputPathIndex)
+  	.pipe(gulp.dest(outputPathIndex))
+    .pipe(connect.reload());
+});
+
+
+// JSON
+// Reloads page when file type is updated
+gulp.task('updateJSON', function () {
+
+  return gulp.src(inputPathJSON)
+  	.pipe(gulp.dest(outputPathJSON))
     .pipe(connect.reload());
 });
 
 
 // SERVER
 // ------
-
+// Setup a local server to run live reloads
 gulp.task('connect', function(){
 
 	connect.server({
-		root: 'builds/development/',
-    	livereload: true
+		root: outputRoot,
+    	livereload: true,
+    	port:8000
 	});
 
 });
-
-
-
 
 
 // WATCH
 gulp.task('watch', function(){
 
 	// JS
-	gulp.watch('components/scripts/*.js', ['concat']);
+	gulp.watch(inputPathJS, ['concatJS']);
 
 	// CSS
-	gulp.watch('components/sass/*.scss',['styles']);
+	gulp.watch( inputPathSASS,['compileSASS']);
 
 	// HTML
-	gulp.watch('builds/development/*.html', ['html']);
+	gulp.watch( inputPathIndex, ['updateHTML']);
+
+	// JSON
+	gulp.watch( inputPathJSON, ['updateJSON']);
 
 });
 
 
-
-
 // DEFAULT
 // -------
-gulp.task('default', ['concat','styles','connect','watch']);
+gulp.task('default', ['concatJS', 'compileSASS', 'updateHTML', 'updateJSON', 'connect', 'watch']);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+// JS
+// UGLIFY
+// ------
+// gulp.task('uglify', function(){
+// 	return gulp.src('components/scripts/*.js')
+// 	.pipe(plumber())
+// 	.pipe(uglify())
+// 	.pipe(gulp.dest('builds/development/js/'));
+// });
 
 
 // JS

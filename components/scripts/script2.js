@@ -8,5 +8,3 @@
 		};
 	};
 
-
-	var	$ = require('jquery'); 
