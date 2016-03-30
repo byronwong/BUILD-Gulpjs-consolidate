@@ -7,6 +7,7 @@
 var gulp = require('gulp'),	// asks node to get the gulp library and assign to var
 	uglify = require('gulp-uglify'),
 	//minify = require('gulp-minify'),
+	minifyHTML = require('gulp-minify-html'),
 	browserify = require('gulp-browserify'),
 	sass = require('gulp-ruby-sass'),
 	concat = require('gulp-concat'),
@@ -17,6 +18,7 @@ var gulp = require('gulp'),	// asks node to get the gulp library and assign to v
 	//gutil = require('gulp-util'), // loging system
 	//coffee = require('gulp-coffee');
 	//compass = require('gulp-compass'),
+	// Image Compression:gulp-imagemin + imagemin-pngcrush
 
 
 // ENVIRONMENTS & OTHER VARIABLES
@@ -132,6 +134,7 @@ gulp.task('compileSASS', function(){
 gulp.task('updateHTML', function () {
 
   return gulp.src(inputPathIndex)
+  	.pipe(gulpif(env === 'production', minifyHTML()))
   	.pipe(gulp.dest(outputPathIndex))
     .pipe(connect.reload());
 });
