@@ -1,0 +1,62 @@
+
+// Typography 
+// ==========
+
+
+// Resources
+// ---------
+
+// http://type-scale.com/ - set type sizing
+// http://www.modularscale.com/
+// https://sassline.com/
+
+
+
+
+
+// Default Block Level item reset
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,p,blockquote,th,td {  
+	margin:0; 
+	padding:0; 
+}
+
+// Vertical Guides
+.show-grid {
+	background-image: -webkit-linear-gradient(top,#0ff 0,rgba(255,255,255,0)1px);
+	background-image: -moz-linear-gradient(top,#0ff 0,rgba(255,255,255,0)1px);
+	background-image: -o-linear-gradient(top,#0ff 0,rgba(255,255,255,0)1px);
+	background-image: linear-gradient(to bottom,#0ff 0,rgba(255,255,255,0)1px);
+	background-repeat: repeat-y;
+	background-size: 100% 1rem;
+}
+
+
+
+
+html {
+	// Normally the default font size is 16px == 1 rem.
+	// By Setting the base font size to 62.5% == 1 rem = 10px
+	// font-size:62.5%;
+	font-size: 20px;
+	font-family: sans-serif;
+}
+
+// This snytax allows you to select all H1-6
+// #{Headings()}{
+// 	font-family: $headFont;
+// 	font-size:3em;
+// }
+
+
+h1 {
+
+	font-size:60px;
+	line-height: 3rem;
+	margin-bottom:1rem;
+}
+
+p {
+	font-size: 20px;
+	line-height: 2rem;
+	margin-bottom:1rem
+}
